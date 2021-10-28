@@ -56,6 +56,16 @@ LD = $(TOOLPREFIX)ld
 OBJCOPY = $(TOOLPREFIX)objcopy
 OBJDUMP = $(TOOLPREFIX)objdump
 
+SCHEDULER = RR
+ifeq ($(SCHEDULER),FCFS)
+	SCHEDULER = FCFS
+endif
+ifeq ($(SCHEDULER), PBS)
+	SCHEDULER = PBS
+endif
+ifeq ($(SCHEDULER), MLFQ)
+	SCHEDULER = MLFQ
+endif
 CFLAGS = -Wall -Werror -O -fno-omit-frame-pointer -ggdb
 CFLAGS += -MD
 CFLAGS += -mcmodel=medany
@@ -70,7 +80,7 @@ endif
 ifneq ($(shell $(CC) -dumpspecs 2>/dev/null | grep -e '[^f]nopie'),)
 CFLAGS += -fno-pie -nopie
 endif
-
+CFLAGS += -D$(SCHEDULER)
 LDFLAGS = -z max-page-size=4096
 
 $K/kernel: $(OBJS) $K/kernel.ld $U/initcode
@@ -133,7 +143,10 @@ UPROGS=\
 	$U/_wc\
 	$U/_zombie\
 	$U/_strace\
-
+	$U/_setpriority\
+	$U/_schedulertest\
+	$U/_time\
+	
 fs.img: mkfs/mkfs README $(UPROGS)
 	mkfs/mkfs fs.img README $(UPROGS)
 
@@ -155,6 +168,9 @@ QEMUGDB = $(shell if $(QEMU) -help | grep -q '^-gdb'; \
 	else echo "-s -p $(GDBPORT)"; fi)
 ifndef CPUS
 CPUS := 3
+endif
+ifeq ($(SCHEDULER), MLFQ)
+CPUS := 1
 endif
 
 QEMUOPTS = -machine virt -bios none -kernel $K/kernel -m 128M -smp $(CPUS) -nographic

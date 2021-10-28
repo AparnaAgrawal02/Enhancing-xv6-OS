@@ -98,9 +98,38 @@ sys_uptime(void)
 uint64
 sys_trace()
 {
-  int mask = 0;
+  int mask;
     if (argint(0, &mask) < 0)
       return -1;
     myproc()->trace_mask = mask;
     return 0;
+}
+uint64
+sys_set_priority()
+{
+  int pid;
+  int sp;  //static priority
+    if (argint(0, &sp) < 0 || argint(1, &pid) <0 )
+      return -1;
+    return set_priority(sp,pid);
+}
+
+uint64
+sys_waitx(void)
+{
+  uint64 addr, addr1, addr2;
+  uint wtime, rtime;
+  if(argaddr(0, &addr) < 0)
+    return -1;
+  if(argaddr(1, &addr1) < 0) // user virtual memory
+    return -1;
+  if(argaddr(2, &addr2) < 0)
+    return -1;
+  int ret = waitx(addr, &wtime, &rtime);
+  struct proc* p = myproc();
+  if (copyout(p->pagetable, addr1,(char*)&wtime, sizeof(int)) < 0)
+    return -1;
+  if (copyout(p->pagetable, addr2,(char*)&rtime, sizeof(int)) < 0)
+    return -1;
+  return ret;
 }

@@ -93,6 +93,16 @@ struct proc {
   int xstate;                  // Exit status to be returned to parent's wait
   int pid;                     // Process ID
   int trace_mask;
+  uint ctime;                   // when the process was created
+  uint rtime;                   //how long the proccess was runnig
+  uint etime;                   //when it exited
+  uint sp;                      //static priority
+  //int dp;                      //dynamic priority
+  int stime;                    //how long the process was sleeping
+  int startsleep;
+  int scheduleNum;            //number of time it got schedule
+
+  
   // wait_lock must be held when using this:
   struct proc *parent;         // Parent process
 

@@ -20,7 +20,7 @@ initlock(struct spinlock *lk, char *name)
 // Loops (spins) until the lock is acquired.
 void
 acquire(struct spinlock *lk)
-{
+{ 
   push_off(); // disable interrupts to avoid deadlock.
   if(holding(lk))
     panic("acquire");
