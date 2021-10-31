@@ -5,7 +5,7 @@
 int 
 main(int argc, char *argv[]) 
 { 
-	char s[64];
+	char s[128];
   int id;
   if(argc <= 1){
     fprintf(2, "argument missing \n");
@@ -20,11 +20,9 @@ main(int argc, char *argv[])
     if (id == 0) { 
       trace(mask);
       exec(s, argv); 
-      //printf("Child: WE DON'T SEE THIS\n"); 
       exit(0);  
     } else { 
       id = wait(0); 
-      //printf("Parent: child terminated\n"); 
     } 
     exit(0); 
 }

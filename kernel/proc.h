@@ -97,10 +97,18 @@ struct proc {
   uint rtime;                   //how long the proccess was runnig
   uint etime;                   //when it exited
   uint sp;                      //static priority
-  //int dp;                      //dynamic priority
+  int dp;                      //static priority
+  
+  int starttime;                //when it started running
+   int lastendrtime;                
   int stime;                    //how long the process was sleeping
-  int startsleep;
   int scheduleNum;            //number of time it got schedule
+
+  int level;                      //queue number for MLFQ
+  int inqueue;                //if the process is in queue or not
+  int qEntry[5] ;             //time at which it entered the queue
+  int q[5];                   //time spent in each queue
+  int qrtime[5];
 
   
   // wait_lock must be held when using this:
@@ -115,4 +123,10 @@ struct proc {
   struct file *ofile[NOFILE];  // Open files
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
+};
+
+
+struct Queue {
+  int rear;
+  struct proc * level[QSIZE];
 };

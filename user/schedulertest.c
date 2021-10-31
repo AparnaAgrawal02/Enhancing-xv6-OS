@@ -4,8 +4,8 @@
 #include "kernel/fcntl.h"
 
 
-#define NFORK 10
-#define IO 5
+#define NFORK 50
+#define IO 25
 
 int main() {
   int n, pid;
@@ -24,8 +24,9 @@ int main() {
             for (volatile int i = 0; i < 1000000000; i++) {} // CPU bound process 
 #ifndef FCFS
           }
-#endif
-          printf("Process %d finished\n", n);
+#endif 
+          printf("Process %d finished\n", getpid());
+          //sleep(200);
           exit(0);
       } else {
 #ifdef PBS
@@ -35,7 +36,7 @@ int main() {
       }
   }
   for(;n > 0; n--) {
-      if(waitx(0,&wtime,&rtime) >= 0) {
+      if(waitx(0,&rtime,&wtime) >= 0) {
           trtime += rtime;
           twtime += wtime;
       } 

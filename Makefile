@@ -57,15 +57,7 @@ OBJCOPY = $(TOOLPREFIX)objcopy
 OBJDUMP = $(TOOLPREFIX)objdump
 
 SCHEDULER = RR
-ifeq ($(SCHEDULER),FCFS)
-	SCHEDULER = FCFS
-endif
-ifeq ($(SCHEDULER), PBS)
-	SCHEDULER = PBS
-endif
-ifeq ($(SCHEDULER), MLFQ)
-	SCHEDULER = MLFQ
-endif
+
 CFLAGS = -Wall -Werror -O -fno-omit-frame-pointer -ggdb
 CFLAGS += -MD
 CFLAGS += -mcmodel=medany
