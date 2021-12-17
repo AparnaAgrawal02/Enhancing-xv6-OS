@@ -545,32 +545,32 @@ called in clockintr()
         }
         }
 
-void update_time()
-{
-  struct proc *p;
-  for (p = proc; p < &proc[NPROC]; p++)
-  {
-    acquire(&p->lock);
-    if (p->state == RUNNING)
-    {
-      p->rtime++;
-      p->qrtime[p->level]+=1;
-      //printf("%d\n", p->rtime);
-    }
-    if (p->state == SLEEPING)
-    {
-      p->stime++;
-      //printf("%d\n", p->stime);
-    }
-    if (p->inqueue == 1)
-    {
-      p->q[p->level]++;
-      //printf("%d\n", p->stime);
-    }
-    release(&p->lock);
-  }
-}
-nrun is updated in scheduler
+        void update_time()
+        {
+          struct proc *p;
+          for (p = proc; p < &proc[NPROC]; p++)
+          {
+            acquire(&p->lock);
+            if (p->state == RUNNING)
+            {
+              p->rtime++;
+              p->qrtime[p->level]+=1;
+              //printf("%d\n", p->rtime);
+            }
+            if (p->state == SLEEPING)
+            {
+              p->stime++;
+              //printf("%d\n", p->stime);
+            }
+            if (p->inqueue == 1)
+            {
+              p->q[p->level]++;
+              //printf("%d\n", p->stime);
+            }
+            release(&p->lock);
+          }
+        }
+        nrun is updated in scheduler
 
 ## QUESTION
  If a process voluntarily relinquishes control of the CPU(eg. For doing I/O), it leaves the queuing network, and when the process becomes ready again after the I/O, it is​ ​inserted at the tail of the same queue, from which it is relinquished earlier​ ​( Q: Explain in the README how could this be exploited by a process
