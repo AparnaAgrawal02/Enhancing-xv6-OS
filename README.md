@@ -1,9 +1,9 @@
-# Enhancing-xv6-OS
-## Specification 1: syscall tracing
-Added $U/_strace to UPROGS in Makefile
-Added a sys_trace() function in kernel/sysproc.c that implements the new system call by remembering its argument in a new variable in the proc structure 
+# Enhancing-xv6-OS  
+## Specification 1: syscall tracing 
+Added $U/_strace to UPROGS in Makefile  
+Added a sys_trace() function in kernel/sysproc.c that implements the new system call by remembering its argument in a new variable in the proc structure   
         uint64
-    sys_trace()
+    sys_trace()  
     {
     int mask;
         if (argint(0, &mask) < 0)
@@ -11,11 +11,11 @@ Added a sys_trace() function in kernel/sysproc.c that implements the new system 
         myproc()->trace_mask = mask;
         return 0;
     } 
-  Modifed fork() (see kernel/proc.c) to copy the trace mask from the parent to the child process.
-    np->trace_mask = p->trace_mask;
-Modifed the syscall() function in kernel/syscall.c to print the trace output. You will need to add an array of syscall names and number of arguments to index into.
-        static char *syscall_name[]={"","fork","exit","wait","pipe","read","kill","exec","fstat","chdir","dup","getpid","sbrk","sleep","uptime","open","write","mknod","unlink","link","mkdir","close","trace"};
-static int syscall_arg[]={0,0,1,1,1,3,1,2,2,1,1,0,1,1,0,2,3,3,1,2,1,1,1};
+  Modifed fork() (see kernel/proc.c) to copy the trace mask from the parent to the child process.  
+    np->trace_mask = p->trace_mask;  
+Modifed the syscall() function in kernel/syscall.c to print the trace output. You will need to add an array of syscall names and number of arguments to index into.  
+ static char *syscall_name[]=  {"","fork","exit","wait","pipe","read","kill","exec","fstat","chdir","dup","getpid","sbrk","sleep","uptime","open","write","mknod","unlink","link","mkdir","close","trace"};  
+static int syscall_arg[]={0,0,1,1,1,3,1,2,2,1,1,0,1,1,0,2,3,3,1,2,1,1,1};  
 void
     syscall(void)
     {
@@ -53,10 +53,10 @@ void
     }
 
 
-### Created a user program in user/strace.c , to generate the user-space stubs for the system call,
-    #include "kernel/types.h"
-    #include "kernel/stat.h"
-    #include "user/user.h"
+### Created a user program in user/strace.c , to generate the user-space stubs for the system call,  
+    #include "kernel/types.h"  
+    #include "kernel/stat.h"  
+    #include "user/user.h"  
 
     int 
     main(int argc, char *argv[]) 
@@ -83,11 +83,11 @@ void
         exit(0); 
     }
 
-added a prototype for the system call to user/user.h , a stub to user/usys.pl , and a syscall number to kernel/syscall.h. The Makefile invokes the Perl script user/usys.pl , which produces user/usys.S , the actual system call stubs, which use the RISC-V ecall instruction to transition to the kernel
+added a prototype for the system call to user/user.h , a stub to user/usys.pl , and a syscall number to kernel/syscall.h. The Makefile invokes the Perl script user/usys.pl , which produces user/usys.S , the actual system call stubs, which use the RISC-V ecall instruction to transition to the kernel  
 
 # Specification 2: Scheduling
 ## changes in MAKEFILE
-        SCHEDULER = RR
+        SCHEDULER = RR  
     ifeq ($(SCHEDULER),FCFS)
         SCHEDULER = FCFS
     endif
@@ -108,7 +108,7 @@ added a prototype for the system call to user/user.h , a stub to user/usys.pl , 
     endif
 
 ## FCFS
-selects the process with the lowest creation time(creation time refers to the tick number when the process was created). The process will run until it no longer needs CPU time.
+selects the process with the lowest creation time(creation time refers to the tick number when the process was created). The process will run until it no longer needs CPU time.  
 
     void scheduler(void)
         { //printf("FCFS");
@@ -165,7 +165,7 @@ selects the process with the lowest creation time(creation time refers to the ti
         }
     }
 ## PBS
-### a non-preemptive priority-based scheduler that selects the processwith the highest priority for execution. In case two or more processes have the same priority, we use the number of times the process has been scheduled to break the tie. If the tie remains, use the start-time of the process to break the tie(processes with lower start times should be scheduled further).
+a non-preemptive priority-based scheduler that selects the processwith the highest priority for execution. In case two or more processes have the same priority, we use the number of times the process has been scheduled to break the tie. If the tie remains, use the start-time of the process to break the tie(processes with lower start times should be scheduled further).  
     void scheduler(void)
     {
         //printf("PBS");
@@ -258,7 +258,7 @@ selects the process with the lowest creation time(creation time refers to the ti
     }
 
 ## set priority system call
- To change the Static Priority add a new system call ​ set_priority(). This resets the niceness to 5 as well. corresponding user program setproiority is also implemented setpriority priority pid
+ To change the Static Priority add a new system call ​ set_priority(). This resets the niceness to 5 as well. corresponding user program setproiority is also implemented setpriority priority pid  
     int set_priority(int sp, int pid)
     {
         int prev = -1;
@@ -283,11 +283,11 @@ selects the process with the lowest creation time(creation time refers to the ti
         return prev;
     }
 ## Multilevel Feedback queue scheduling (MLFQ)
- MFQS runs a process for a time quantum and then it can change its priority(if it is a long process). Thus it learns from past behavior of the process and then predicts its future behavior. This way it tries to run a shorter process first thus optimizing turnaround time. MFQS also reduces the response time.
- a simplified preemptive MLFQ scheduler that allows processes to move between different priority queues based on their behavior and CPU bursts.
-    ● If a process uses too much CPU time, it is pushed to a lower priority queue,
-        leaving I/O bound and interactive processes in the higher priority queues.
-    ● To prevent starvation, implement aging.
+ MFQS runs a process for a time quantum and then it can change its priority(if it is a long process). Thus it learns from past behavior of the process and then predicts its future behavior. This way it tries to run a shorter process first thus optimizing turnaround time. MFQS also reduces the response time.  
+ a simplified preemptive MLFQ scheduler that allows processes to move between different priority queues based on their behavior and CPU bursts.  
+    ● If a process uses too much CPU time, it is pushed to a lower priority queue,  
+        leaving I/O bound and interactive processes in the higher priority queues.  
+    ● To prevent starvation, implement aging.  
 
         void scheduler(void)
     { 
@@ -360,7 +360,7 @@ selects the process with the lowest creation time(creation time refers to the ti
         }
     }
 
-### helper function
+### helper function  
             void dequeue(struct Queue *queue)
         {
         // if queue is empty
@@ -468,8 +468,8 @@ called in clockintr()
                 release(&p->lock);
             }
         }
-### For Preemtion
-    Added this in both usertrap and kernel trap in trap.c
+### For Preemtion  
+    Added this in both usertrap and kernel trap in trap.c  
 
         #if MLFQ
     if (which_dev == 2 && myproc() != 0 && myproc()->state == RUNNING)
@@ -574,17 +574,17 @@ nrun is updated in scheduler
 
 ## QUESTION
  If a process voluntarily relinquishes control of the CPU(eg. For doing I/O), it leaves the queuing network, and when the process becomes ready again after the I/O, it is​ ​inserted at the tail of the same queue, from which it is relinquished earlier​ ​( Q: Explain in the README how could this be exploited by a process
-    A process can have I/O every time just before the timeslice completes and the I/o burst could be really small
-    so though the process is more cpu bound it remains in the same priority queue and doesnot degrade .thus gain a higher percentage of CPU time.
+    A process can have I/O every time just before the timeslice completes and the I/o burst could be really small  
+    so though the process is more cpu bound it remains in the same priority queue and doesnot degrade .thus gain a higher percentage of CPU time.  
 # Performance 
-    with 25 I/o bound and 50 cpu bound process with 3 cpu
+    with 25 I/o bound and 50 cpu bound process with 3 cpu  
     RR: Average rtime 31,  wtime 328
-
-    with 25 I/o bound and 50 cpu bound process with 1 cpu
+ 
+    with 25 I/o bound and 50 cpu bound process with 1 cpu               
     MLFQ:Average rtime 24,  wtime 654
 
-    PBS:with 25 I/o bound with 80 static priority and 50 cpu bound process with deafaut(60) priority with 3 cpu
-   Average rtime 36,  wtime 234
+    PBS:with 25 I/o bound with 80 static priority and 50 cpu bound process with deafaut(60) priority with 3 cpu  
+   Average rtime 36,  wtime 234  
 
-    50 cpubound processes   with 3 cpu
-    FCFS: Average rtime 62,  wtime 477
+    50 cpubound processes   with 3 cpu  
+    FCFS: Average rtime 62,  wtime 477  
